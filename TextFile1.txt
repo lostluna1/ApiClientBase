@@ -1,0 +1,521 @@
+﻿{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "GMES.Core后台Api",
+    "description": "这是对文档的描述。。",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:9100"
+    }
+  ],
+  "paths": {
+    "/api/AteSet/CreateAteSet": {
+      "post": {
+        "tags": [
+          "AteSet"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AteSet"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AteSet"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AteSet"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AteSet"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/AteSet/GetAteSetList": {
+      "post": {
+        "tags": [
+          "AteSet"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AteSet"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AteSet"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AteSet"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AteSet"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/AteSet/CreateLabelCheckGroup": {
+      "post": {
+        "tags": [
+          "AteSet"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckGroup"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckGroup"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckGroup"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckGroup"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/AteSet/CreateLabelCheckPlan": {
+      "post": {
+        "tags": [
+          "AteSet"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckPlan"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckPlan"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckPlan"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckPlan"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/AteSet/BizProductBindLabel": {
+      "post": {
+        "tags": [
+          "AteSet"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizProductBindLabel"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizProductBindLabel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizProductBindLabel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizProductBindLabel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/AteSet/GetLablePlan": {
+      "post": {
+        "tags": [
+          "AteSet"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizProductBindLabel"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizProductBindLabel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizProductBindLabel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizProductBindLabel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/AteSet/GetlabelCheckPlan": {
+      "post": {
+        "tags": [
+          "AteSet"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckPlan"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckPlan"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckPlan"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckPlan"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/AteSet/GetlabelCheckGroup": {
+      "post": {
+        "tags": [
+          "AteSet"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckGroup"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckGroup"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckGroup"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BizLableCheckGroup"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/AteSet/Upload": {
+      "post": {
+        "tags": [
+          "AteSet"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileInput": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              },
+              "encoding": {
+                "fileInput": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/AteSet/FileRender": {
+      "get": {
+        "tags": [
+          "AteSet"
+        ],
+        "parameters": [
+          {
+            "name": "fileName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+    
+  },
+  "components": {
+    "schemas": {
+
+      "AteSet": {
+        "type": "object",
+        "properties": {
+          "biz_atetestitemname": {
+            "type": "string",
+            "nullable": true
+          },
+          "tablename": {
+            "type": "string",
+            "nullable": true
+          },
+          "seq": {
+            "type": "string",
+            "nullable": true
+          },
+          "test_item": {
+            "type": "string",
+            "nullable": true
+          },
+          "product": {
+            "type": "string",
+            "nullable": true
+          },
+          "mis_judge_time": {
+            "type": "string",
+            "nullable": true
+          },
+          "mfglinename": {
+            "type": "string",
+            "nullable": true
+          },
+          "enable": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BizLableCheckGroup": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "employee": {
+            "type": "string",
+            "nullable": true
+          },
+          "biz_LabelCheckGroupDetails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Biz_LabelCheckGrouplist"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Biz_LabelCheckGrouplist": {
+        "type": "object",
+        "properties": {
+          "biz_LabelCheckType": {
+            "type": "string",
+            "nullable": true
+          },
+          "checkStartPosition": {
+            "type": "string",
+            "nullable": true
+          },
+          "checkEndPosition": {
+            "type": "string",
+            "nullable": true
+          },
+          "checkValue": {
+            "type": "string",
+            "nullable": true
+          },
+          "checkItemSequence": {
+            "type": "string",
+            "nullable": true
+          },
+          "barcodeLength": {
+            "type": "string",
+            "nullable": true
+          },
+          "biz_label_group": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "BizLableCheckPlan": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "employee": {
+            "type": "string",
+            "nullable": true
+          },
+          "biz_LabelCheckPlanDetails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Biz_LabelCheckPlanlist"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "BizProductBindLabel": {
+        "type": "object",
+        "properties": {
+          "product": {
+            "type": "string",
+            "nullable": true
+          },
+          "biz_label_plan": {
+            "type": "string",
+            "nullable": true
+          },
+          "employee": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "JWT授权token前面需要加上字段Bearer与一个空格,如Bearer token",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ]
+}

@@ -1,0 +1,680 @@
+﻿<Page
+    x:Class="ApiClient.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:ApiClient.Helpers"
+    xmlns:localControls="using:ApiClient.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="using:ApiClient.ViewModels"
+    NavigationCacheMode="Enabled"
+    mc:Ignorable="d">
+
+    <Grid x:Name="ContentArea">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                x:Name="LeftColumn"
+                Width="300"
+                MinWidth="250"
+                MaxWidth="600" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!--  左侧API树形结构  -->
+        <Grid Grid.Column="0" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--  搜索和导入按钮  -->
+            <StackPanel
+                Grid.Row="0"
+                Margin="0,0,0,10"
+                Orientation="Vertical"
+                Spacing="8">
+                <AutoSuggestBox
+                    HorizontalAlignment="Stretch"
+                    PlaceholderText="搜索接口..."
+                    QueryIcon="Find"
+                    QuerySubmitted="OnSearchSubmitted"
+                    Text="{x:Bind ViewModel.SearchKeyword, Mode=TwoWay}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <DropDownButton Grid.Column="0" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <FontIcon Glyph="&#xEA53;" />
+                            <TextBlock Text="导入接口" />
+                        </StackPanel>
+                        <DropDownButton.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem
+                                    Click="FromUrl_Click"
+                                    Icon="Link"
+                                    Text="从URL导入" />
+                                <MenuFlyoutItem
+                                    Click="FromJson_Click"
+                                    Icon="Document"
+                                    Text="从JSON导入" />
+                            </MenuFlyout>
+                        </DropDownButton.Flyout>
+                    </DropDownButton>
+
+                    <Button
+                        Grid.Column="2"
+                        HorizontalAlignment="Stretch"
+                        Command="{x:Bind ViewModel.CreateNewRequestTabCommand}"
+                        Style="{StaticResource AccentButtonStyle}"
+                        ToolTipService.ToolTip="创建新的请求标签页">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock HorizontalAlignment="Left" Text="🚀" />
+                            <TextBlock HorizontalAlignment="Right" Text="快速测试" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </StackPanel>
+
+            <!--  API集合树形视图  -->
+            <Border
+                Grid.Row="2"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="4">
+                <Grid>
+                    <!--  TreeView  -->
+                    <TreeView
+                        x:Name="InterfacesTreeView"
+                        CanDragItems="False"
+                        CanReorderItems="False"
+                        ItemsSource="{x:Bind ViewModel.TreeRootNodes}"
+                        SelectedItem="{x:Bind ViewModel.SelectedTreeNode, Mode=TwoWay}"
+                        SelectionChanged="OnTreeViewSelectionChanged"
+                        Visibility="{x:Bind ViewModel.TreeRootNodes.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}">
+                        <TreeView.ItemTemplate>
+                            <DataTemplate x:DataType="viewmodels:TreeNodeViewModel">
+                                <TreeViewItem IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}" ItemsSource="{x:Bind Children}">
+                                    <Grid>
+                                        <!--  集合和文件夹显示  -->
+                                        <StackPanel
+                                            Orientation="Horizontal"
+                                            Spacing="8"
+                                            Visibility="{x:Bind NodeType, Converter={StaticResource NodeTypeToVisibilityConverter}, ConverterParameter='NotRequest'}">
+                                            <TextBlock FontSize="14" Text="{x:Bind Icon}" />
+                                            <TextBlock
+                                                FontWeight="{x:Bind NodeType, Converter={StaticResource NodeTypeToFontWeightConverter}}"
+                                                Text="{x:Bind Name}"
+                                                TextWrapping="NoWrap"
+                                                ToolTipService.ToolTip="{x:Bind Name}" />
+                                        </StackPanel>
+
+                                        <!--  API请求显示  -->
+                                        <StackPanel
+                                            Orientation="Horizontal"
+                                            Spacing="8"
+                                            Visibility="{x:Bind NodeType, Converter={StaticResource NodeTypeToVisibilityConverter}, ConverterParameter='Request'}">
+                                            <!--  HTTP方法标签  -->
+                                            <Border
+                                                Margin="0,0,4,0"
+                                                Padding="6,2"
+                                                Background="{x:Bind RequestRecord.Method, Converter={StaticResource HttpMethodToColorConverter}}"
+                                                CornerRadius="3">
+                                                <TextBlock
+                                                    FontSize="10"
+                                                    FontWeight="Bold"
+                                                    Foreground="White"
+                                                    Text="{x:Bind RequestRecord.Method}" />
+                                            </Border>
+
+                                            <!--  接口名称  -->
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                Text="{x:Bind Name}"
+                                                TextWrapping="NoWrap"
+                                                ToolTipService.ToolTip="{x:Bind RequestRecord.Url}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </TreeViewItem>
+                            </DataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+
+
+                    <!--  空状态提示  -->
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="10"
+                        Visibility="{x:Bind ViewModel.TreeRootNodes.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}, ConverterParameter='Zero'}">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="16"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="🔍" />
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="{x:Bind GetEmptyStateMessage(ViewModel.SearchKeyword), Mode=OneWay}"
+                            TextAlignment="Center" />
+                        <Button
+                            HorizontalAlignment="Center"
+                            Click="ClearSearch_Click"
+                            Content="清空搜索"
+                            Visibility="{x:Bind ViewModel.SearchKeyword, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!--  PropertySizer - 绑定到一个简单的代码属性  -->
+        <controls:PropertySizer
+            Grid.Column="1"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Stretch"
+            Binding="{x:Bind LeftPanelWidthValue, Mode=TwoWay}"
+            Maximum="600"
+            Minimum="250" />
+
+        <!--  右侧区域 - 包含标签页和固定的请求配置/响应区域  -->
+        <Grid Grid.Column="2" Margin="10,10,10,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--  标签页控制栏  -->
+            <StackPanel
+                Grid.Row="0"
+                Margin="0,15,0,8"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal"
+                Spacing="8"
+                Visibility="{x:Bind ViewModel.ShouldShowTabListButton, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+
+                <Button
+                    x:Name="TabListButton"
+                    Padding="8"
+                    Click="OnTabListButtonClick"
+                    Style="{StaticResource DateTimePickerFlyoutButtonStyle}"
+                    ToolTipService.ToolTip="显示所有标签页列表">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <SymbolIcon Symbol="List" />
+                        <TextBlock FontSize="12" Text="{x:Bind ViewModel.RequestTabs.Count, Mode=OneWay}" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <!--  TabView - 现在只包含请求行部分  -->
+            <TabView
+                x:Name="RequestTabView"
+                Grid.Row="1"
+                Margin="0,0,0,0"
+                AddTabButtonClick="OnAddTabButtonClick"
+                CanDragTabs="True"
+                CanReorderTabs="True"
+                IsAddTabButtonVisible="True"
+                SelectedItem="{x:Bind ViewModel.SelectedRequestTab, Mode=TwoWay}"
+                TabCloseRequested="OnTabCloseRequested"
+                TabItemsSource="{x:Bind ViewModel.RequestTabs}"
+                TabWidthMode="SizeToContent">
+                <TabView.TabItemTemplate>
+                    <DataTemplate x:DataType="viewmodels:RequestTabViewModel">
+                        <TabViewItem
+                            MinWidth="250"
+                            Header="{x:Bind TabTitle, Mode=OneWay}"
+                            RightTapped="OnTabViewItemRightTapped">
+                            <Border Margin="0,12,0,0">
+                                <localControls:RequestEditorControl ViewModel="{x:Bind}" />
+                            </Border>
+                        </TabViewItem>
+                    </DataTemplate>
+                </TabView.TabItemTemplate>
+            </TabView>
+
+            <!--  固定的请求配置和响应区域  -->
+            <Grid
+                Grid.Row="2"
+                Margin="0,10,0,0"
+                DataContext="{x:Bind ViewModel.SelectedRequestTab, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.HasSelectedTab, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+
+                <!--  请求配置区域  -->
+                <Grid Grid.Column="0" Margin="0,0,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock
+                        Grid.Row="0"
+                        Margin="0,0,0,10"
+                        FontWeight="SemiBold"
+                        Text="请求配置" />
+
+                    <!--  请求配置标签页选择器  -->
+                    <controls:Segmented
+                        x:Name="RequestConfigSegmented"
+                        Grid.Row="1"
+                        Margin="0,0,0,10"
+                        HorizontalAlignment="Stretch"
+                        SelectedIndex="0">
+                        <controls:SegmentedItem Content="Params" Tag="params" />
+                        <controls:SegmentedItem Content="Body" Tag="body" />
+                        <controls:SegmentedItem Content="Headers" Tag="headers" />
+                    </controls:Segmented>
+
+                    <!--  请求配置内容区域  -->
+                    <Grid Grid.Row="2">
+                        <!--  Params 标签页  -->
+                        <ScrollViewer Visibility="{Binding SelectedItem.Tag, ElementName=RequestConfigSegmented, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=params}">
+                            <StackPanel Spacing="10">
+                                <TextBlock
+                                    Margin="0,0,0,5"
+                                    FontWeight="SemiBold"
+                                    Text="Query 参数" />
+
+                                <!--  查询参数列表  -->
+                                <ListView ItemsSource="{Binding QueryParameters}">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate x:DataType="viewmodels:QueryParameterViewModel">
+                                            <Grid Margin="0,2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="30" />
+                                                    <ColumnDefinition Width="120" />
+                                                    <ColumnDefinition Width="120" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="30" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <CheckBox Grid.Column="0" IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
+
+                                                <TextBox
+                                                    Grid.Column="1"
+                                                    Margin="5,0"
+                                                    PlaceholderText="参数名"
+                                                    Text="{Binding Key, Mode=TwoWay}" />
+
+                                                <TextBox
+                                                    Grid.Column="2"
+                                                    Margin="5,0"
+                                                    PlaceholderText="参数值"
+                                                    Text="{Binding Value, Mode=TwoWay}" />
+
+                                                <TextBox
+                                                    Grid.Column="3"
+                                                    Margin="5,0"
+                                                    PlaceholderText="说明"
+                                                    Text="{Binding Description, Mode=TwoWay}" />
+
+                                                <Button
+                                                    Grid.Column="4"
+                                                    Width="20"
+                                                    Height="20"
+                                                    Padding="0"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Command="{Binding DataContext.RemoveQueryParameterCommand, ElementName=ContentArea}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="✕"
+                                                    FontSize="10" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+
+                                <Button
+                                    HorizontalAlignment="Left"
+                                    Command="{Binding AddQueryParameterCommand}"
+                                    Content="添加参数"
+                                    Style="{StaticResource AccentButtonStyle}" />
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!--  Body 标签页  -->
+                        <Grid Visibility="{Binding SelectedItem.Tag, ElementName=RequestConfigSegmented, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=body}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <!--  Body 类型选择  -->
+                            <StackPanel
+                                Grid.Row="0"
+                                Margin="0,0,0,10"
+                                Orientation="Horizontal"
+                                Spacing="10">
+                                <RadioButton
+                                    Content="none"
+                                    GroupName="BodyType"
+                                    IsChecked="{Binding SelectedBodyType, Mode=TwoWay, Converter={StaticResource StringToBooleanConverter}, ConverterParameter=none}" />
+                                <RadioButton
+                                    Content="form-data"
+                                    GroupName="BodyType"
+                                    IsChecked="{Binding SelectedBodyType, Mode=TwoWay, Converter={StaticResource StringToBooleanConverter}, ConverterParameter=form-data}" />
+                                <RadioButton
+                                    Content="json"
+                                    GroupName="BodyType"
+                                    IsChecked="{Binding SelectedBodyType, Mode=TwoWay, Converter={StaticResource StringToBooleanConverter}, ConverterParameter=json}" />
+                                <RadioButton
+                                    Content="raw"
+                                    GroupName="BodyType"
+                                    IsChecked="{Binding SelectedBodyType, Mode=TwoWay, Converter={StaticResource StringToBooleanConverter}, ConverterParameter=raw}" />
+                                <RadioButton
+                                    Content="xml"
+                                    GroupName="BodyType"
+                                    IsChecked="{Binding SelectedBodyType, Mode=TwoWay, Converter={StaticResource StringToBooleanConverter}, ConverterParameter=xml}" />
+                            </StackPanel>
+
+                            <!--  Body 内容区域  -->
+                            <Border
+                                Grid.Row="1"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4">
+
+                                <!--  根据选择的类型显示不同内容  -->
+                                <Grid>
+                                    <!--  None Body  -->
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="此请求没有Body"
+                                        Visibility="{Binding SelectedBodyType, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=none}" />
+
+                                    <!--  统一的编辑器 - 支持JSON、XML、Raw  -->
+                                    <localControls:BindableMonacoEditor
+                                        x:Name="UnifiedBodyEditor"
+                                        EditorLanguage="{Binding EditorLanguage, Mode=OneWay}"
+                                        EditorTheme="{Binding CurrentTheme, Mode=OneWay}"
+                                        HideScrollbars="True"
+                                        Text="{Binding UnifiedBodyContent, Mode=TwoWay}"
+                                        Visibility="{Binding IsUnifiedEditorVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                                    <!--  Form-data Body  -->
+                                    <ScrollViewer Visibility="{Binding SelectedBodyType, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=form-data}">
+                                        <StackPanel Margin="10" Spacing="10">
+                                            <ListView ItemsSource="{Binding FormDataItems}">
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate x:DataType="viewmodels:FormDataItemViewModel">
+                                                        <Grid Margin="0,2">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="30" />
+                                                                <ColumnDefinition Width="120" />
+                                                                <ColumnDefinition Width="120" />
+                                                                <ColumnDefinition Width="60" />
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="30" />
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <CheckBox Grid.Column="0" IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
+
+                                                            <TextBox
+                                                                Grid.Column="1"
+                                                                Margin="5,0"
+                                                                PlaceholderText="Key"
+                                                                Text="{Binding Key, Mode=TwoWay}" />
+
+                                                            <TextBox
+                                                                Grid.Column="2"
+                                                                Margin="5,0"
+                                                                PlaceholderText="Value"
+                                                                Text="{Binding Value, Mode=TwoWay}" />
+
+                                                            <ComboBox
+                                                                Grid.Column="3"
+                                                                Margin="5,0"
+                                                                SelectedItem="{Binding Type, Mode=TwoWay}">
+                                                                <ComboBoxItem Content="text" />
+                                                                <ComboBoxItem Content="file" />
+                                                            </ComboBox>
+
+                                                            <TextBox
+                                                                Grid.Column="4"
+                                                                Margin="5,0"
+                                                                PlaceholderText="说明"
+                                                                Text="{Binding Description, Mode=TwoWay}" />
+
+                                                            <Button
+                                                                Grid.Column="5"
+                                                                Width="20"
+                                                                Height="20"
+                                                                Padding="0"
+                                                                Background="Transparent"
+                                                                BorderThickness="0"
+                                                                Command="{Binding DataContext.RemoveFormDataItemCommand, ElementName=ContentArea}"
+                                                                CommandParameter="{Binding}"
+                                                                Content="✕"
+                                                                FontSize="10" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+                                            </ListView>
+
+                                            <Button
+                                                HorizontalAlignment="Left"
+                                                Command="{Binding AddFormDataItemCommand}"
+                                                Content="添加字段"
+                                                Style="{StaticResource AccentButtonStyle}" />
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <!--  Headers 标签页  -->
+                        <ScrollViewer Visibility="{Binding SelectedItem.Tag, ElementName=RequestConfigSegmented, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=headers}">
+                            <StackPanel Spacing="10">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <TextBlock FontWeight="SemiBold" Text="Headers" />
+                                    <TextBlock
+                                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                        Text="⚡ 隐藏自动生成的"
+                                        ToolTipService.ToolTip="隐藏根据请求类型自动生成的Headers" />
+                                </StackPanel>
+
+                                <!--  Headers 列表  -->
+                                <ListView ItemsSource="{Binding HeaderItems}">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate x:DataType="viewmodels:HeaderItemViewModel">
+                                            <Grid Margin="0,2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="30" />
+                                                    <ColumnDefinition Width="120" />
+                                                    <ColumnDefinition Width="120" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="30" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <CheckBox Grid.Column="0" IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
+
+                                                <ComboBox
+                                                    Grid.Column="1"
+                                                    Margin="5,0"
+                                                    IsEditable="True"
+                                                    Text="{Binding Key, Mode=TwoWay}">
+                                                    <x:String>Accept</x:String>
+                                                    <x:String>Accept-Encoding</x:String>
+                                                    <x:String>Accept-Language</x:String>
+                                                    <x:String>Authorization</x:String>
+                                                    <x:String>Cache-Control</x:String>
+                                                    <x:String>Content-Type</x:String>
+                                                    <x:String>Cookie</x:String>
+                                                    <x:String>Host</x:String>
+                                                    <x:String>Referer</x:String>
+                                                    <x:String>User-Agent</x:String>
+                                                    <x:String>X-Requested-With</x:String>
+                                                </ComboBox>
+
+                                                <TextBox
+                                                    Grid.Column="2"
+                                                    Margin="5,0"
+                                                    PlaceholderText="Header值"
+                                                    Text="{Binding Value, Mode=TwoWay}" />
+
+                                                <TextBox
+                                                    Grid.Column="3"
+                                                    Margin="5,0"
+                                                    PlaceholderText="说明"
+                                                    Text="{Binding Description, Mode=TwoWay}" />
+
+                                                <Button
+                                                    Grid.Column="4"
+                                                    Width="20"
+                                                    Height="20"
+                                                    Padding="0"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Command="{Binding DataContext.RemoveHeaderItemCommand, ElementName=ContentArea}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="✕"
+                                                    FontSize="10"
+                                                    IsEnabled="{Binding IsAutoGenerated, Converter={StaticResource BooleanInverterConverter}}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+
+                                <Button
+                                    HorizontalAlignment="Left"
+                                    Command="{Binding AddHeaderItemCommand}"
+                                    Content="添加Header"
+                                    Style="{StaticResource AccentButtonStyle}" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
+
+                <!--  响应区域  -->
+                <Grid Grid.Column="1" Margin="10,0,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel
+                        Grid.Row="0"
+                        Margin="0,0,0,10"
+                        Orientation="Horizontal"
+                        Spacing="10">
+                        <TextBlock FontWeight="SemiBold" Text="响应结果:" />
+                        <TextBlock Foreground="{Binding ResponseStatusCode, Mode=OneWay, Converter={StaticResource StatusCodeColorConverter}}" Text="{Binding ResponseStatusCode, Mode=OneWay}" />
+                        <TextBlock Text="{Binding ResponseStatusText, Mode=OneWay}" />
+                        <TextBlock Text="{Binding ResponseTime, Mode=OneWay}" />
+                        <TextBlock Text="ms" />
+                    </StackPanel>
+
+                    <!--  响应内容标签页选择器  -->
+                    <controls:Segmented
+                        x:Name="ResponseSegmented"
+                        Grid.Row="1"
+                        Margin="0,0,0,10"
+                        HorizontalAlignment="Stretch"
+                        SelectedIndex="0">
+                        <controls:SegmentedItem Content="响应体" Tag="body" />
+                        <controls:SegmentedItem Content="响应头" Tag="headers" />
+                    </controls:Segmented>
+
+                    <!--  响应内容区域  -->
+                    <Grid Grid.Row="2">
+                        <!--  响应体  -->
+                        <Border
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Visibility="{Binding SelectedItem.Tag, ElementName=ResponseSegmented, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=body}">
+                            <ScrollViewer>
+                                <localControls:BindableMonacoEditor
+                                    x:Name="ResponseEditor"
+                                    EditorLanguage="{Binding ResponseEditorLanguage, Mode=OneWay}"
+                                    EditorTheme="{Binding CurrentTheme, Mode=OneWay}"
+                                    HideScrollbars="True"
+                                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                    Text="{Binding ResponseContent, Mode=TwoWay}" />
+                            </ScrollViewer>
+                        </Border>
+
+                        <!--  响应头  -->
+                        <Border
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Visibility="{Binding SelectedItem.Tag, ElementName=ResponseSegmented, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=headers}">
+                            <ScrollViewer>
+                                <TextBox
+                                    Padding="10"
+                                    AcceptsReturn="True"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    FontFamily="Consolas"
+                                    IsReadOnly="True"
+                                    Text="{Binding ResponseHeaders, Mode=OneWay}"
+                                    TextWrapping="Wrap" />
+                            </ScrollViewer>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <!--  当没有选中标签页时显示的提示  -->
+            <StackPanel
+                Grid.Row="2"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="20"
+                Visibility="{x:Bind ViewModel.HasSelectedTab, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Inverse'}">
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="24"
+                    Text="📝" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="16"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="选择或创建一个请求标签页开始配置"
+                    TextAlignment="Center" />
+            </StackPanel>
+
+            <!--  无标签页时的欢迎界面  -->
+            <StackPanel
+                Grid.Row="2"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="20"
+                Visibility="{x:Bind ViewModel.RequestTabs.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}, ConverterParameter='Zero'}">
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="48"
+                    Text="🚀" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    Text="欢迎使用API客户端" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="点击左侧接口或创建新请求开始使用"
+                    TextAlignment="Center" />
+                <Button
+                    HorizontalAlignment="Center"
+                    Command="{x:Bind ViewModel.CreateNewRequestTabCommand}"
+                    Content="创建新请求"
+                    Style="{ThemeResource AccentButtonStyle}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

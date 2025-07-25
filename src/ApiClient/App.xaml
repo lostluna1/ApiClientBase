@@ -1,0 +1,33 @@
+﻿<Application
+    x:Class="ApiClient.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="using:ApiClient.Helpers">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <ResourceDictionary Source="/Styles/FontSizes.xaml" />
+                <ResourceDictionary Source="/Styles/Thickness.xaml" />
+                <ResourceDictionary Source="/Styles/TextBlock.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- 值转换器 -->
+            <helpers:BoolNegationConverter x:Key="BoolNegationConverter"/>
+            <helpers:StatusCodeColorConverter x:Key="StatusCodeColorConverter"/>
+            <helpers:BoolToColorConverter x:Key="BoolToColorConverter"/>
+            <helpers:NodeTypeToFontWeightConverter x:Key="NodeTypeToFontWeightConverter"/>
+            <helpers:NodeTypeToVisibilityConverter x:Key="NodeTypeToVisibilityConverter"/>
+            <helpers:HttpMethodToColorConverter x:Key="HttpMethodToColorConverter"/>
+            <helpers:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+            <helpers:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+            <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <helpers:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
+            <helpers:BoolToFontWeightConverter x:Key="BoolToFontWeightConverter"/>
+            <helpers:BoolToAccentColorConverter x:Key="BoolToAccentColorConverter"/>
+            <helpers:StringToBooleanConverter x:Key="StringToBooleanConverter"/>
+            <helpers:BooleanInverterConverter x:Key="BooleanInverterConverter"/>
+            <helpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentDialog
+    x:Class="ApiClient.Views.ImportFromJsonDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:ApiClient.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="从Json导入"
+    DefaultButton="Primary"
+    PrimaryButtonCommand="{x:Bind ViewModel.ImportFromJsonCommand}"
+    PrimaryButtonText="确定"
+    Style="{StaticResource DefaultContentDialogStyle}"
+    mc:Ignorable="d">
+
+    <Grid>
+        <TextBox
+            Header="输入Json"
+            Text="{x:Bind ViewModel.JsonContent, Mode=TwoWay}"
+            TextWrapping="Wrap" />
+    </Grid>
+</ContentDialog>

@@ -1,0 +1,32 @@
+﻿<UserControl
+    x:Class="ApiClient.Controls.RequestEditorControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="60"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+
+    <!--  请求行  -->
+    <StackPanel
+        Margin="0,10,0,10"
+        Orientation="Horizontal"
+        Spacing="10">
+        <ComboBox
+            Width="100"
+            ItemsSource="{Binding HttpMethods}"
+            SelectedItem="{Binding SelectedMethod, Mode=TwoWay}" />
+
+        <TextBox
+            Width="400"
+            PlaceholderText="输入请求URL"
+            Text="{Binding RequestUrl, Mode=TwoWay}" />
+
+        <Button
+            Padding="20,8"
+            Command="{Binding SendRequestCommand}"
+            Content="发送请求"
+            Style="{ThemeResource AccentButtonStyle}" />
+    </StackPanel>
+</UserControl>

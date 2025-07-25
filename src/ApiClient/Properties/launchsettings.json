@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "ApiClient (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "ApiClient (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}
